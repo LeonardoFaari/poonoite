@@ -10,6 +10,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 
 public class Tela extends JFrame implements ActionListener, WindowListener {
     protected Dimension dFrame, dLabel, dTextField, 
@@ -19,8 +20,11 @@ public class Tela extends JFrame implements ActionListener, WindowListener {
     protected Button cmdEntrada, cmdRetirada, 
             cmdConsulta, cmdSair;
     protected TextArea txtMsg;
+    private Caixa caixa;
     
     public Tela(){
+        //Instanciar objeto caixa
+        caixa = new Caixa();
         //Aparência da Tela
         dFrame = new Dimension(350,400);
         dLabel = new Dimension(40,20);
@@ -53,14 +57,17 @@ public class Tela extends JFrame implements ActionListener, WindowListener {
         cmdEntrada = new Button("Entrada");
         cmdEntrada.setSize(dButton);
         cmdEntrada.setLocation(25,150);
+        cmdEntrada.addActionListener(this);
         this.add(cmdEntrada);
         cmdConsulta = new Button("Consulta");
         cmdConsulta.setSize(dButton);
         cmdConsulta.setLocation(25,185);
+        cmdConsulta.addActionListener(this);
         this.add(cmdConsulta);
         cmdRetirada = new Button("Retirada");
         cmdRetirada.setSize(dButton);
         cmdRetirada.setLocation(180,150);
+        cmdRetirada.addActionListener(this);
         this.add(cmdRetirada);
         cmdSair = new Button("Sair");
         cmdSair.setSize(dButton);
@@ -78,8 +85,42 @@ public class Tela extends JFrame implements ActionListener, WindowListener {
 
     @Override
     public void actionPerformed(ActionEvent e) {
+        txtSaldo.setText(null);
         if(e.getSource()==cmdSair){
             System.exit(0);
+        }
+        if(e.getSource()==cmdEntrada){
+            double valor = Double.parseDouble(txtValor.getText());
+            boolean op = caixa.depositar(valor);
+            if(op==true){
+                JOptionPane.showMessageDialog(null, "Depósito efetuado");
+                txtMsg.append("Depósito de " + valor + " efetuado \n");
+            }else{
+                JOptionPane.showMessageDialog(null, "Valor inválido");
+                txtMsg.append("Depósito não efetuado \n");
+            }
+            txtValor.setText(null);
+            txtValor.requestFocus();  // coloca o foco no controle
+        }
+        if(e.getSource()==cmdRetirada){
+            double valor = Double.parseDouble(txtValor.getText());
+            boolean op = caixa.sacar(valor);
+            if(op==true){
+                JOptionPane.showMessageDialog(null, "Saque efetuado");
+                txtMsg.append("Saque de " + valor + " efetuado \n");
+            }else{
+                JOptionPane.showMessageDialog(null, "Saldo não disponível");
+                txtMsg.append("Saque não efetuado \n");
+            }
+            txtValor.setText(null);
+            txtValor.requestFocus();  // coloca o foco no controle
+        }
+        if(e.getSource()==cmdConsulta){
+            txtSaldo.setText(String.valueOf(caixa.getSaldo()));
+            txtMsg.append("Consulta efetuada valor saldo momento: "
+                    + caixa.getSaldo() + "\n");
+            txtValor.setText(null);
+            txtValor.requestFocus();
         }
     }
 
